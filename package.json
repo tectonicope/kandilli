@@ -1,0 +1,49 @@
+{
+  "name": "@tectonicope/kandilli",
+  "version": "1.0.0",
+  "description": "Real-time earthquake data scraper for Kandilli Observatory.",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "start": "vercel dev",
+    "deploy": "vercel deploy --prod",
+    "publish": "npm publish --access public"
+  },
+  "dependencies": {
+    "cheerio": "^1.0.0",
+    "hono": "^4.7.1",
+    "tweetnacl": "^1.0.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.3.0",
+    "vercel": "^32.4.1"
+  },
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "earthquake",
+    "kandilli",
+    "tectonicope",
+    "seismic",
+    "monitoring",
+    "api"
+  ],
+  "author": {
+    "name": "aepasahan.dev",
+    "email": "aepasahan.dev@gmail.com",
+    "url": "https://github.com/aepasahan"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:tectonicope/kandilli.git"
+  },
+  "bugs": {
+    "url": "https://github.com/tectonicope/kandilli/issues"
+  },
+  "homepage": "https://github.com/tectonicope/kandilli#readme"
+}
