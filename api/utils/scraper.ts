@@ -1,5 +1,4 @@
 import { load } from 'cheerio';
-import nacl from 'tweetnacl';
 
 const KANDILLI_URL = "http://www.koeri.boun.edu.tr/scripts/lst0.asp";
 
@@ -35,10 +34,4 @@ export async function fetchEarthquakes() {
     console.error("Error fetching earthquake data:", error);
     return [];
   }
-}
-
-function generateHash(input: string): string {
-  // Tweetnacl hash function
-  const hash = nacl.hash(new TextEncoder().encode(input));
-  return Buffer.from(hash).toString('hex');
 }

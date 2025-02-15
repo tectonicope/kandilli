@@ -13,8 +13,7 @@
   },
   "dependencies": {
     "cheerio": "^1.0.0",
-    "hono": "^4.7.1",
-    "tweetnacl": "^1.0.3"
+    "hono": "^4.7.1"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
