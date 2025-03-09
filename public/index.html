@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kandilli Observatory API Documentation</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #f5f5f5;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    }
+    
+    .api-docs {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+      color: #333;
+    }
+    
+    header {
+      margin-bottom: 30px;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 20px;
+    }
+    
+    header h1 {
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
+    
+    .api-section {
+      margin-bottom: 20px;
+      border: 1px solid #eee;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    
+    .section-header {
+      padding: 15px 20px;
+      background-color: #f8f9fa;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+    }
+    
+    .section-header h2 {
+      margin: 0;
+      font-size: 18px;
+      flex: 0 0 150px;
+    }
+    
+    .section-header p {
+      margin: 0;
+      flex: 1;
+      color: #666;
+    }
+    
+    .toggle-icon {
+      font-size: 20px;
+      font-weight: bold;
+    }
+    
+    .endpoints {
+      padding: 0 10px;
+      display: none;
+    }
+    
+    .section-header.active + .endpoints {
+      display: block;
+    }
+    
+    .endpoint {
+      margin: 10px 0;
+      border: 1px solid #eee;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    
+    .endpoint-header {
+      padding: 15px;
+      cursor: pointer;
+      background-color: #fff;
+    }
+    
+    .endpoint-method-path {
+      display: flex;
+      align-items: center;
+      margin-bottom: 5px;
+    }
+    
+    .method {
+      padding: 5px 10px;
+      border-radius: 3px;
+      font-weight: bold;
+      font-size: 12px;
+      text-transform: uppercase;
+      margin-right: 10px;
+    }
+    
+    .method.get {
+      background-color: #61affe;
+      color: white;
+    }
+    
+    .method.post {
+      background-color: #49cc90;
+      color: white;
+    }
+    
+    .path {
+      font-family: monospace;
+      font-size: 14px;
+    }
+    
+    .description {
+      margin: 0;
+      color: #666;
+      font-size: 14px;
+    }
+    
+    .endpoint-details {
+      padding: 15px;
+      border-top: 1px solid #eee;
+      background-color: #fafafa;
+      display: none;
+    }
+    
+    .endpoint-header.active + .endpoint-details {
+      display: block;
+    }
+    
+    .parameters {
+      margin-bottom: 20px;
+    }
+    
+    .params-table {
+      display: grid;
+      grid-template-columns: 1fr 1fr 2fr 1fr 1fr;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    
+    .param-header {
+      display: contents;
+      font-weight: bold;
+    }
+    
+    .param-header span {
+      padding: 8px;
+      background-color: #f0f0f0;
+      border-radius: 3px;
+    }
+    
+    .param-row {
+      display: contents;
+    }
+    
+    .param-row span {
+      padding: 8px;
+      align-self: center;
+    }
+    
+    .param-row input {
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 3px;
+    }
+    
+    .execute {
+      margin: 20px 0;
+    }
+    
+    button {
+      padding: 10px 15px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      color: white;
+    }
+    
+    button.get {
+      background-color: #61affe;
+    }
+    
+    button.post {
+      background-color: #49cc90;
+    }
+    
+    button:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+    
+    .response, .response-examples {
+      margin-top: 20px;
+    }
+    
+    .response-status, .example-status {
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+    
+    .response-body, .example-body {
+      background-color: #272b33;
+      color: #fff;
+      padding: 15px;
+      border-radius: 4px;
+      overflow: auto;
+    }
+    
+    pre {
+      margin: 0;
+      white-space: pre-wrap;
+      font-family: monospace;
+    }
+    
+    .example {
+      margin-bottom: 20px;
+    }
+    
+    .example-description {
+      margin-bottom: 10px;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <div class="api-docs">
+    <header>
+      <h1>Kandilli Observatory API Documentation</h1>
+      <p>Interactive documentation for the Kandilli Observatory Earthquake API</p>
+    </header>
+    
+    <main id="api-docs-container">
+      <!-- API sections will be dynamically generated here -->
+    </main>
+  </div>
+
+  <script>
+    // Store state
+    let activeSection = null;
+    let activeEndpoint = null;
+    const paramValues = {};
+    const responseStore = {};
+    
+    // API Documentation Data
+    const apiDocs = [
+      {
+        name: 'Quakes',
+        description: 'Endpoints for retrieving earthquake data',
+        endpoints: [
+          {
+            path: '/api/quakes',
+            method: 'GET',
+            description: 'Get all earthquakes',
+            responses: [
+              {
+                status: 200,
+                description: 'List of all earthquakes',
+                example: { earthquakes: [{ date: '2023.01.01', time: '12:00:00', latitude: 40.123, longitude: 29.456, depth: 10.5, magnitude: 4.2, location: 'EXAMPLE LOCATION' }] }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        name: 'Filters',
+        description: 'Endpoints for filtering earthquake data',
+        endpoints: [
+          {
+            path: '/api/filters/date',
+            method: 'GET',
+            description: 'Filter earthquakes by date range',
+            parameters: [
+              { name: 'start', type: 'string', description: 'Start date (YYYY.MM.DD)', required: true, default: '' },
+              { name: 'end', type: 'string', description: 'End date (YYYY.MM.DD)', required: true, default: '' }
+            ],
+            responses: [
+              {
+                status: 200,
+                description: 'Filtered earthquakes by date range',
+                example: { earthquakes: [{ date: '2023.01.01', time: '12:00:00', latitude: 40.123, longitude: 29.456, depth: 10.5, magnitude: 4.2, location: 'EXAMPLE LOCATION' }] }
+              }
+            ]
+          },
+          {
+            path: '/api/filters/magnitude',
+            method: 'GET',
+            description: 'Filter earthquakes by magnitude range',
+            parameters: [
+              { name: 'min', type: 'number', description: 'Minimum magnitude', required: false, default: '0' },
+              { name: 'max', type: 'number', description: 'Maximum magnitude', required: false, default: '10' }
+            ],
+            responses: [
+              {
+                status: 200,
+                description: 'Filtered earthquakes by magnitude range',
+                example: { earthquakes: [{ date: '2023.01.01', time: '12:00:00', latitude: 40.123, longitude: 29.456, depth: 10.5, magnitude: 4.2, location: 'EXAMPLE LOCATION' }] }
+              }
+            ]
+          },
+          {
+            path: '/api/filters/location',
+            method: 'GET',
+            description: 'Filter earthquakes by location',
+            parameters: [
+              { name: 'q', type: 'string', description: 'Location query', required: true, default: '' }
+            ],
+            responses: [
+              {
+                status: 200,
+                description: 'Filtered earthquakes by location',
+                example: { earthquakes: [{ date: '2023.01.01', time: '12:00:00', latitude: 40.123, longitude: 29.456, depth: 10.5, magnitude: 4.2, location: 'EXAMPLE LOCATION' }] }
+              }
+            ]
+          },
+          {
+            path: '/api/filters/radius',
+            method: 'GET',
+            description: 'Filter earthquakes by geographic radius',
+            parameters: [
+              { name: 'lat', type: 'number', description: 'Latitude', required: true, default: '' },
+              { name: 'lon', type: 'number', description: 'Longitude', required: true, default: '' },
+              { name: 'radius', type: 'number', description: 'Radius in kilometers', required: false, default: '100' }
+            ],
+            responses: [
+              {
+                status: 200,
+                description: 'Filtered earthquakes by geographic radius',
+                example: { earthquakes: [{ date: '2023.01.01', time: '12:00:00', latitude: 40.123, longitude: 29.456, depth: 10.5, magnitude: 4.2, location: 'EXAMPLE LOCATION' }] }
+              }
+            ]
+          },
+          {
+            path: '/api/filters/latest',
+            method: 'GET',
+            description: 'Get latest N earthquakes',
+            parameters: [
+              { name: 'limit', type: 'number', description: 'Number of earthquakes to return', required: false, default: '10' }
+            ],
+            responses: [
+              {
+                status: 200,
+                description: 'Latest earthquakes',
+                example: { earthquakes: [{ date: '2023.01.01', time: '12:00:00', latitude: 40.123, longitude: 29.456, depth: 10.5, magnitude: 4.2, location: 'EXAMPLE LOCATION' }] }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        name: 'Statistics',
+        description: 'Endpoints for earthquake statistics',
+        endpoints: [
+          {
+            path: '/api/statistics/daily',
+            method: 'GET',
+            description: 'Get daily earthquake count',
+            responses: [
+              {
+                status: 200,
+                description: 'Daily earthquake counts',
+                example: { daily_counts: { '2023.01.01': 5, '2023.01.02': 3 } }
+              }
+            ]
+          },
+          {
+            path: '/api/statistics/magnitude-distribution',
+            method: 'GET',
+            description: 'Get magnitude distribution',
+            responses: [
+              {
+                status: 200,
+                description: 'Magnitude distribution',
+                example: { magnitude_distribution: [{ range: '0-2', count: 10 }, { range: '2-3', count: 15 }] }
+              }
+            ]
+          },
+          {
+            path: '/api/statistics/region-distribution',
+            method: 'GET',
+            description: 'Get region distribution',
+            responses: [
+              {
+                status: 200,
+                description: 'Region distribution',
+                example: { region_distribution: [{ region: 'ISTANBUL', count: 5 }, { region: 'IZMIR', count: 3 }] }
+              }
+            ]
+          },
+          {
+            path: '/api/statistics/depth-distribution',
+            method: 'GET',
+            description: 'Get depth distribution',
+            responses: [
+              {
+                status: 200,
+                description: 'Depth distribution',
+                example: { depth_distribution: [{ range: '0-5 km', count: 8 }, { range: '5-10 km', count: 12 }] }
+              }
+            ]
+          },
+          {
+            path: '/api/statistics/summary',
+            method: 'GET',
+            description: 'Get summary statistics',
+            responses: [
+              {
+                status: 200,
+                description: 'Summary statistics',
+                example: { summary: { total_earthquakes: 100, max_magnitude: 5.6, avg_magnitude: 3.2, avg_depth: 8.5 } }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        name: 'Alerts',
+        description: 'Endpoints for earthquake alerts',
+        endpoints: [
+          {
+            path: '/api/alerts/significant',
+            method: 'GET',
+            description: 'Get significant earthquakes',
+            parameters: [
+              { name: 'min', type: 'number', description: 'Minimum magnitude', required: false, default: '4.0' }
+            ],
+            responses: [
+              {
+                status: 200,
+                description: 'Significant earthquakes',
+                example: { significant_earthquakes: [{ date: '2023.01.01', time: '12:00:00', latitude: 40.123, longitude: 29.456, depth: 10.5, magnitude: 4.2, location: 'EXAMPLE LOCATION' }] }
+              }
+            ]
+          }
+        ]
+      }
+    ];
+
+    // Function to render API sections
+    function renderApiDocs() {
+      const container = document.getElementById('api-docs-container');
+      
+      apiDocs.forEach((section, sectionIndex) => {
+        // Create section element
+        const sectionElement = document.createElement('div');
+        sectionElement.className = 'api-section';
+        sectionElement.id = `section-${sectionIndex}`;
+        
+        // Create section header
+        const sectionHeader = document.createElement('div');
+        sectionHeader.className = 'section-header';
+        sectionHeader.innerHTML = `
+          <h2>${section.name}</h2>
+          <p>${section.description}</p>
+          <span class="toggle-icon">+</span>
+        `;
+        
+        // Add click event to section header
+        sectionHeader.addEventListener('click', () => toggleSection(sectionIndex));
+        
+        // Create endpoints container
+        const endpointsContainer = document.createElement('div');
+        endpointsContainer.className = 'endpoints';
+        
+        // Create endpoints
+        section.endpoints.forEach((endpoint, endpointIndex) => {
+          const endpointElement = createEndpointElement(endpoint, sectionIndex, endpointIndex);
+          endpointsContainer.appendChild(endpointElement);
+        });
+        
+        // Append elements to section
+        sectionElement.appendChild(sectionHeader);
+        sectionElement.appendChild(endpointsContainer);
+        
+        // Append section to container
+        container.appendChild(sectionElement);
+      });
+    }
+    
+    // Function to create endpoint element
+    function createEndpointElement(endpoint, sectionIndex, endpointIndex) {
+      const endpointElement = document.createElement('div');
+      endpointElement.className = 'endpoint';
+      endpointElement.id = `endpoint-${sectionIndex}-${endpointIndex}`;
+      
+      // Create endpoint header
+      const endpointHeader = document.createElement('div');
+      endpointHeader.className = 'endpoint-header';
+      endpointHeader.innerHTML = `
+        <div class="endpoint-method-path">
+          <span class="method ${endpoint.method.toLowerCase()}">${endpoint.method}</span>
+          <span class="path">${endpoint.path}</span>
+        </div>
+        <p class="description">${endpoint.description}</p>
+      `;
+      
+      // Add click event to endpoint header
+      endpointHeader.addEventListener('click', () => toggleEndpoint(sectionIndex, endpointIndex));
+      
+      // Create endpoint details
+      const endpointDetails = document.createElement('div');
+      endpointDetails.className = 'endpoint-details';
+      
+      // Add parameters if they exist
+      if (endpoint.parameters && endpoint.parameters.length > 0) {
+        const parametersSection = document.createElement('div');
+        parametersSection.className = 'parameters';
+        parametersSection.innerHTML = '<h3>Parameters</h3>';
+        
+        const paramsTable = document.createElement('div');
+        paramsTable.className = 'params-table';
+        
+        // Add table header
+        const paramHeader = document.createElement('div');
+        paramHeader.className = 'param-header';
+        paramHeader.innerHTML = `
+          <span>Name</span>
+          <span>Type</span>
+          <span>Description</span>
+          <span>Required</span>
+          <span>Value</span>
+        `;
+        paramsTable.appendChild(paramHeader);
+        
+        // Add parameters
+        endpoint.parameters.forEach(param => {
+          const paramId = `param-${sectionIndex}-${endpointIndex}-${param.name}`;
+          const paramRow = document.createElement('div');
+          paramRow.className = 'param-row';
+          paramRow.innerHTML = `
+            <span>${param.name}</span>
+            <span>${param.type}</span>
+            <span>${param.description}</span>
+            <span>${param.required ? 'Yes' : 'No'}</span>
+            <input type="text" id="${paramId}" value="${param.default || ''}" placeholder="${param.required ? 'Required' : 'Optional'}">
+          `;
+          
+          // Store parameter value when changed
+          const inputElement = paramRow.querySelector('input');
+          inputElement.addEventListener('change', (e) => {
+            paramValues[paramId] = e.target.value;
+          });
+          
+          paramsTable.appendChild(paramRow);
+        });
+        
+        parametersSection.appendChild(paramsTable);
+        endpointDetails.appendChild(parametersSection);
+      }
+      
+      // Add execute button
+      const executeSection = document.createElement('div');
+      executeSection.className = 'execute';
+      const executeButton = document.createElement('button');
+      executeButton.className = endpoint.method.toLowerCase();
+      executeButton.textContent = `Execute Request`;
+      executeButton.addEventListener('click', () => executeRequest(sectionIndex, endpointIndex));
+      executeSection.appendChild(executeButton);
+      endpointDetails.appendChild(executeSection);
+      
+      // Add response section
+      const responseSection = document.createElement('div');
+      responseSection.className = 'response';
+      responseSection.innerHTML = `
+        <h3>Response</h3>
+        <div class="response-status"></div>
+        <div class="response-body">
+          <pre></pre>
+        </div>
+      `;
+      responseSection.style.display = 'none';
+      endpointDetails.appendChild(responseSection);
+      
+      // Add response examples
+      if (endpoint.responses && endpoint.responses.length > 0) {
+        const examplesSection = document.createElement('div');
+        examplesSection.className = 'response-examples';
+        examplesSection.innerHTML = '<h3>Response Examples</h3>';
+        
+        endpoint.responses.forEach(response => {
+          const example = document.createElement('div');
+          example.className = 'example';
+          example.innerHTML = `
+            <div class="example-description">${response.description}</div>
+            <div class="example-status">Status: ${response.status}</div>
+            <div class="example-body">
+              <pre>${JSON.stringify(response.example, null, 2)}</pre>
+            </div>
+          `;
+          examplesSection.appendChild(example);
+        });
+        
+        endpointDetails.appendChild(examplesSection);
+      }
+      
+      // Append elements to endpoint
+      endpointElement.appendChild(endpointHeader);
+      endpointElement.appendChild(endpointDetails);
+      
+      return endpointElement;
+    }
+    
+    // Function to toggle section
+    function toggleSection(sectionIndex) {
+      const sectionId = `section-${sectionIndex}`;
+      const sectionHeader = document.querySelector(`#${sectionId} .section-header`);
+      
+      if (activeSection === sectionIndex) {
+        // Close current section
+        sectionHeader.classList.remove('active');
+        sectionHeader.querySelector('.toggle-icon').textContent = '+';
+        activeSection = null;
+      } else {
+        // Close previous section if exists
+        if (activeSection !== null) {
+          const prevSectionHeader = document.querySelector(`#section-${activeSection} .section-header`);
+          prevSectionHeader.classList.remove('active');
+          prevSectionHeader.querySelector('.toggle-icon').textContent = '+';
+        }
+        
+        // Open new section
+        sectionHeader.classList.add('active');
+        sectionHeader.querySelector('.toggle-icon').textContent = '-';
+        activeSection = sectionIndex;
+      }
+    }
+    
+    // Function to toggle endpoint
+    function toggleEndpoint(sectionIndex, endpointIndex) {
+      const endpointId = `endpoint-${sectionIndex}-${endpointIndex}`;
+      const endpointHeader = document.querySelector(`#${endpointId} .endpoint-header`);
+      
+      if (activeEndpoint === `${sectionIndex}-${endpointIndex}`) {
+        // Close current endpoint
+        endpointHeader.classList.remove('active');
+        activeEndpoint = null;
+      } else {
+        // Close previous endpoint if exists
+        if (activeEndpoint !== null) {
+          const [prevSectionIndex, prevEndpointIndex] = activeEndpoint.split('-');
+          const prevEndpointHeader = document.querySelector(`#endpoint-${prevSectionIndex}-${prevEndpointIndex} .endpoint-header`);
+          if (prevEndpointHeader) {
+            prevEndpointHeader.classList.remove('active');
+          }
+        }
+        
+        // Open new endpoint
+        endpointHeader.classList.add('active');
+        activeEndpoint = `${sectionIndex}-${endpointIndex}`;
+      }
+    }
+    
+    // Function to execute request
+    function executeRequest(sectionIndex, endpointIndex) {
+      const endpoint = apiDocs[sectionIndex].endpoints[endpointIndex];
+      const endpointId = `endpoint-${sectionIndex}-${endpointIndex}`;
+      const responseSection = document.querySelector(`#${endpointId} .response`);
+      const responseStatus = responseSection.querySelector('.response-status');
+      const responseBody = responseSection.querySelector('.response-body pre');
+      
+      // Show response section
+      responseSection.style.display = 'block';
+      responseStatus.textContent = 'Loading...';
+      
+      // Build URL with parameters
+      let url = endpoint.path;
+      const queryParams = [];
+      
+      if (endpoint.parameters && endpoint.parameters.length > 0) {
+        endpoint.parameters.forEach(param => {
+          const paramId = `param-${sectionIndex}-${endpointIndex}-${param.name}`;
+          const value = paramValues[paramId] || param.default || '';
+          
+          if (value) {
+            queryParams.push(`${param.name}=${encodeURIComponent(value)}`);
+          }
+        });
+      }
+      
+      if (queryParams.length > 0) {
+        url += `?${queryParams.join('&')}`;
+      }
+      
+      // Simulate API request (for demo purposes)
+      setTimeout(() => {
+        // Get example response
+        const exampleResponse = endpoint.responses[0];
+        
+        // Store response
+        responseStore[`${sectionIndex}-${endpointIndex}`] = exampleResponse.example;
+        
+        // Update response section
+        responseStatus.textContent = `Status: ${exampleResponse.status} OK`;
+        responseBody.textContent = JSON.stringify(exampleResponse.example, null, 2);
+      }, 500);
+    }
+    
+    // Initialize the API documentation
+    document.addEventListener('DOMContentLoaded', () => {
+      renderApiDocs();
+    });
